@@ -106,6 +106,7 @@ def add_vehicle_txn(session, vehicle_type, longitude, latitude, battery):
     # YOU MAY FIND THIS LINK IN THE SQLALCHEMY DOCS USEFUL:
     # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.add
 
+    session.add(new_row)
 
     return str(vehicle_id)  # Return the new id.
 
@@ -138,6 +139,9 @@ def remove_vehicle_txn(session, vehicle_id):
     # YOU MAY FIND THIS LINK IN THE SQLALCHEMY DOCS USEFUL:
     # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.delete
 
+    session.delete(vehicle)
+    session.flush()
+    
     return True  # Should return True when vehicle is deleted.
 
 
