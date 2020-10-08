@@ -146,6 +146,9 @@ Start-Job -ScriptBlock {cockroach start --insecure --listen-addr=localhost:26259
 --store=cockroach-data-3}
 ```
 
+En los parametros de arranque especificamos el puerto por el que cada nodo estara escuchando, `listen-addr`, - en nuestro caso como los ejecutaremos en la misma máquina, hemos puesto puertos diferentes. Tambien se indica mediante `join`, un conjunto de nodos que conforman el cluster. No hace falta especificar todos, pero por asociación, se terminarán descubriendo todos los nodos que conforman el cluster - whisper protocol. 
+
+También se especifica la dirección en la que podremos encontrar la web de administración de cada nodo `http-addr`, y donde se guardaran los datos `store`.
 Podemos ver el estado de los jobs:
 
 ```ps
