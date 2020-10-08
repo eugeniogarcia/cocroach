@@ -62,7 +62,7 @@ Creamos una tabla. La tabla tiene una primary key de tipo `UUID`. Sino especific
 CREATE TABLE students (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), name STRING);
 ```
 
-Podemos ver la definición de la tabla:
+Podemos ver la definiciÃ³n de la tabla:
 
 ```ps
 SHOW CREATE students;
@@ -80,13 +80,13 @@ SHOW CREATE students;
 Time: 7.3716ms
 ```
 
-Vamos a crear otra tabla que tenga un primary key compuesto por más de una columna:
+Vamos a crear otra tabla que tenga un primary key compuesto por mÃ¡s de una columna:
 
 ```ps
 CREATE TABLE courses (sys_id UUID DEFAULT gen_random_uuid(), course_id INT, name STRING, PRIMARY KEY (sys_id, course_id));
 ```
 
-Podemos modificar una tabla. Vamos a añadir una columna llamada `schedule`:
+Podemos modificar una tabla. Vamos a aÃ±adir una columna llamada `schedule`:
 
 ```ps
 ALTER TABLE courses ADD COLUMN schedule STRING;
@@ -116,17 +116,17 @@ SHOW CREATE TABLE products;
 
 # Cluster Concepts: The Keyspace, Ranges, and Replicas
 
-Cocroach organiza la información en __Keyspaces__. El Keyspace es un conjunto de key-values con la primary key. Los Keyspaces a medida que van creación se van dividiendo en __ranges__. Un range tiene que ser mas pequeño que 64MB. Si el keyspace va creciendo de forma que un range supere los 64MB, Cocroach dividira el range en dos.
+Cocroach organiza la informaciÃ³n en __Keyspaces__. El Keyspace es un conjunto de key-values con la primary key. Los Keyspaces a medida que van creaciÃ³n se van dividiendo en __ranges__. Un range tiene que ser mas pequeÃ±o que 64MB. Si el keyspace va creciendo de forma que un range supere los 64MB, Cocroach dividira el range en dos.
 
-Cada range se replicará en un número impar de __replicas__. Las replicas son copias de un range.
+Cada range se replicarÃ¡ en un nÃºmero impar de __replicas__. Las replicas son copias de un range.
 
-El factor de replicación puede definirse/controlarse a nivel de cluster, base de datos y de tabla.
+El factor de replicaciÃ³n puede definirse/controlarse a nivel de cluster, base de datos y de tabla.
 
 Para gestionar las replicas Cocroach utiliza [Raft](http://thesecretlivesofdata.com/raft/). Cada Rango tiene sus replicas en lo que se denomina un `Raft group`. En cada grupo tenemos un lider y varios seguidores.
 
-Para la escritura Cocroach usa Raft. Todas las escrituras se dirigen al lider, este las envia a los distintos followers, y cuando recibe confirmación de una mayoría de los followers de que la escritura se ha hecho, se confirma al cliente que la escritura se ha completado y al __lease holder__. El lease holder es uno de los nodos del Raft group. Cocroach tratara siempre que sea posible colocar el lease hoder y el lider de Raft. Podemos verlo con un ejemplo de [lecturas y escrituras](https://www.cockroachlabs.com/docs/stable/architecture/reads-and-writes-overview.html).
+Para la escritura Cocroach usa Raft. Todas las escrituras se dirigen al lider, este las envia a los distintos followers, y cuando recibe confirmaciÃ³n de una mayorÃ­a de los followers de que la escritura se ha hecho, se confirma al cliente que la escritura se ha completado y al __lease holder__. El lease holder es uno de los nodos del Raft group. Cocroach tratara siempre que sea posible colocar el lease hoder y el lider de Raft. Podemos verlo con un ejemplo de [lecturas y escrituras](https://www.cockroachlabs.com/docs/stable/architecture/reads-and-writes-overview.html).
 
-Cuando un cliente necesita hacer una lectura o una escritura puede contactar con cualquiera de los nodos del cluster. Tipicamente tendremos un balanceador que distribuira las peticiones de los clientes entre los nodos del cluster. El nodo que reciba la petición se denomina __gateway__. En el caso de una escritura, el gateway identificará cual es el nodo lider del Raft group, y reenviara la petición hacia ese nodo, iniciandose el proceso de log replication. Cuando el lider tenga confirmados los commits de una mayoría de los followers, respondera al gateway, y este al cliente. En caso de una lecutura el proceso es similar. En este caso no se lanza un proceso de replicación de logs, pero el gateway tiene que identificar quien es el lease holder de los datos, y __puede haber varios lease holders__. Enviaría la petición a cada uno de ellos, y a medida que estos le vayan contestando, el gateway iría consolidando las respuestas. Cuando tenga todas las respuestas, el gateway contestará al cliente.
+Cuando un cliente necesita hacer una lectura o una escritura puede contactar con cualquiera de los nodos del cluster. Tipicamente tendremos un balanceador que distribuira las peticiones de los clientes entre los nodos del cluster. El nodo que reciba la peticiÃ³n se denomina __gateway__. En el caso de una escritura, el gateway identificarÃ¡ cual es el nodo lider del Raft group, y reenviara la peticiÃ³n hacia ese nodo, iniciandose el proceso de log replication. Cuando el lider tenga confirmados los commits de una mayorÃ­a de los followers, respondera al gateway, y este al cliente. En caso de una lecutura el proceso es similar. En este caso no se lanza un proceso de replicaciÃ³n de logs, pero el gateway tiene que identificar quien es el lease holder de los datos, y __puede haber varios lease holders__ - habrÃ¡ un solo lease holder por cada range, pero como podemos tener varios ranges, puede haber varios lease holders. EnviarÃ­a la peticiÃ³n a cada uno de ellos, y a medida que estos le vayan contestando, el gateway irÃ­a consolidando las respuestas. Cuando tenga todas las respuestas, el gateway contestarÃ¡ al cliente.
 
 ## Ejercicio
 
@@ -183,7 +183,7 @@ https://www.cockroachlabs.com/docs/v19.2/secure-a-cluster.html
 *
 ```
 
-Todabía no hemos inicializado el cluster. Esto tenemos que hacerlo la primera vez:
+TodabÃ­a no hemos inicializado el cluster. Esto tenemos que hacerlo la primera vez:
 
 ```ps
 cockroach init --insecure --host=localhost:26257
@@ -191,11 +191,11 @@ cockroach init --insecure --host=localhost:26257
 Cluster successfully initialized
 ```
 
-Ahora podemos ver el estado del cluster de cockroach en la página administrativa. La podemos abrir en la dirección especificada con el flag `--http-addr`. Por ejemplo en `http://localhost:8082`:
+Ahora podemos ver el estado del cluster de cockroach en la pÃ¡gina administrativa. La podemos abrir en la direcciÃ³n especificada con el flag `--http-addr`. Por ejemplo en `http://localhost:8082`:
 
 ![AdminUI](./imagenes/Admin.png)
 
-Podemos añadir más nodos al cluster:
+Podemos aÃ±adir mÃ¡s nodos al cluster:
 
 ```ps
 Start-Job -ScriptBlock {cockroach start --insecure --listen-addr=localhost:26260 --join="localhost:26257,localhost:26258,localhost:26259" `
@@ -209,12 +209,12 @@ Start-Job -ScriptBlock {cockroach start --insecure --listen-addr=localhost:26261
   --store=cockroach-data-5}
 ```
 
-Cuando tenemos un cluster con tres nodos, y el factor de replicación es tres, en cada nodo habrá una copia de un rango. Si un nodo muere, el cluster pasara a un estado inestable puesto que estamos por debajo del factor de replicación - el cluster sigue estando operativo porque tenemos aún suficientes nodos para mantener el quorum. Si el cluster tuviera más nodos Cockroach hara lo siguiente:
+Cuando tenemos un cluster con tres nodos, y el factor de replicaciÃ³n es tres, en cada nodo habrÃ¡ una copia de un rango. Si un nodo muere, el cluster pasara a un estado inestable puesto que estamos por debajo del factor de replicaciÃ³n - el cluster sigue estando operativo porque tenemos aÃºn suficientes nodos para mantener el quorum. Si el cluster tuviera mÃ¡s nodos Cockroach hara lo siguiente:
 
-- Inicialmente la situación no será diferente de la del caso de tres nodos
-- Cuando el cluster tiene solo tres nodos solo hay una cosa que pueda hacerse, salvo añadir un nuevo nodo. Sin embargo, si en el cluster hubiera más nodos, tras cinco minutos - valor por defecto -, el cluster dará por perdido el nodo, y como en el cluster tenemos otros nodos disponibles, Cockroach utilizara el resto de nodos del cluster para replicar en ellos los rangos que no tienen su cuota de replicas, de modo que al final del proceso la salud del cluster estará completamente restaurada
+- Inicialmente la situaciÃ³n no serÃ¡ diferente de la del caso de tres nodos
+- Cuando el cluster tiene solo tres nodos solo hay una cosa que pueda hacerse, salvo aÃ±adir un nuevo nodo. Sin embargo, si en el cluster hubiera mÃ¡s nodos, tras cinco minutos - valor por defecto -, el cluster darÃ¡ por perdido el nodo, y como en el cluster tenemos otros nodos disponibles, Cockroach utilizara el resto de nodos del cluster para replicar en ellos los rangos que no tienen su cuota de replicas, de modo que al final del proceso la salud del cluster estarÃ¡ completamente restaurada
 
-Que sucedería si antes de que transcurrieran esos cincon minutos otro nodo fallase. Ya no tendríamos el quuorum y el cluster ya no sería operativo ni para leer ni para escribir. Si queremos poder cubrir también este escenario tendríamos que incrementar el factor de replicación. Si el factor en lugar de ser tres fuera cinco, tendrían que fallar más de dos nodos para que no pudieramos tener quorum.
+Que sucederÃ­a si antes de que transcurrieran esos cincon minutos otro nodo fallase. Ya no tendrÃ­amos el quuorum y el cluster ya no serÃ­a operativo ni para leer ni para escribir. Si queremos poder cubrir tambiÃ©n este escenario tendrÃ­amos que incrementar el factor de replicaciÃ³n. Si el factor en lugar de ser tres fuera cinco, tendrÃ­an que fallar mÃ¡s de dos nodos para que no pudieramos tener quorum.
 
 Podemos especificar el tiempo en el que el cluster considera que el nodo no volvera:
 
@@ -233,7 +233,7 @@ After a column is indexed, SQL can easily filter its values using the index inst
 
 ### Creation
 
-__Each table automatically has an index created called primary__, which indexes either its primary key __or—if there is no primary key—a unique value for each row known as rowid__. We recommend always defining a primary key because the index it creates provides much better performance than letting CockroachDB use rowid.
+__Each table automatically has an index created called primary__, which indexes either its primary key __orÂ—if there is no primary keyÂ—a unique value for each row known as rowid__. We recommend always defining a primary key because the index it creates provides much better performance than letting CockroachDB use rowid.
 
 The primary index helps filter a table's primary key but doesn't help SQL find values in any other columns. However, __you can use secondary indexes to improve the performance of queries using columns not in a table's primary key__. You can create them:
 
@@ -317,9 +317,9 @@ EXPLAIN SELECT * FROM users WHERE id = 1;
 Time: 3.3449ms
 ```
 
-Ha usado el índice primario `users@primary`. No ha hecho una búsqueda distribuida.
+Ha usado el Ã­ndice primario `users@primary`. No ha hecho una bÃºsqueda distribuida.
 
-Si usamos columnas que no son parte del índice primario, vemos que se sigue usando el primario:
+Si usamos columnas que no son parte del Ã­ndice primario, vemos que se sigue usando el primario:
 
 ```ps
 EXPLAIN SELECT * FROM users WHERE last_name = 'Cross' AND first_name = 'William';
@@ -357,7 +357,7 @@ SHOW INDEXES FROM users;
 Time: 6.5107ms
 ```
 
-Repetimos la búsqueda, y vemos que ahora se usa el índice secundario:
+Repetimos la bÃºsqueda, y vemos que ahora se usa el Ã­ndice secundario:
 
 ```ps
 EXPLAIN SELECT * FROM users WHERE last_name = 'Cross' AND first_name = 'William';
@@ -367,7 +367,7 @@ EXPLAIN SELECT * FROM users WHERE last_name = 'Cross' AND first_name = 'William'
              | distributed | false
              | vectorized  | false
   index-join |             |
-   ¦         | table       | users@primary
+   Â¦         | table       | users@primary
    +-- scan  |             |
              | table       | users@my_index
              | spans       | /"Cross"/"William"-/"Cross"/"William"/PrefixEnd
@@ -397,7 +397,7 @@ SELECT * FROM users WHERE name = 'Cheyenne Smith';
 Time: 1.718ms
 ```
 
-### Acceso por índice primario
+### Acceso por Ã­ndice primario
 
 ```ps
 EXPLAIN SELECT * FROM users WHERE name = 'Cheyenne Smith';
@@ -415,7 +415,7 @@ EXPLAIN SELECT * FROM users WHERE name = 'Cheyenne Smith';
 Time: 1.1907ms
 ```
 
-Hace un `scan` de la tabla usando el índice primario `users@primary`:
+Hace un `scan` de la tabla usando el Ã­ndice primario `users@primary`:
 
 ```txt
 | table       | users@primary
@@ -433,9 +433,9 @@ A medida que se recuperano los registros aplicamos un filtro:
 | filter      | name = 'Cheyenne Smith'
 ```
 
-### Acceso por índice secundario
+### Acceso por Ã­ndice secundario
 
-Creamos un índice secundario:
+Creamos un Ã­ndice secundario:
 
 ```ps
 CREATE INDEX on users (name);
@@ -464,7 +464,7 @@ EXPLAIN SELECT * FROM users WHERE name = 'Cheyenne Smith';
              | distributed | false
              | vectorized  | false
   index-join |             |
-   ¦         | table       | users@primary
+   Â¦         | table       | users@primary
    +-- scan  |             |
              | table       | users@users_name_idx
              | spans       | /"Cheyenne Smith"-/"Cheyenne Smith"/PrefixEnd
@@ -473,7 +473,7 @@ EXPLAIN SELECT * FROM users WHERE name = 'Cheyenne Smith';
 Time: 1.9876ms
 ```
 
-Ahora usamos el índice secundario. El índice secundario ordena por `name`, así qeu podemos localizar los registros que nos interesan usando solamente el índice. 
+Ahora usamos el Ã­ndice secundario. El Ã­ndice secundario ordena por `name`, asÃ­ qeu podemos localizar los registros que nos interesan usando solamente el Ã­ndice. 
 
 ```txt
 +-- scan  |             |
@@ -481,19 +481,19 @@ Ahora usamos el índice secundario. El índice secundario ordena por `name`, así q
 		 | spans       | /"Cheyenne Smith"-/"Cheyenne Smith"/PrefixEnd
 ```
 
-Como los datos que tenemos que recuperar no son exclusivamente los del índice, para cada dato que identifiquemos tenemos que acceder a la tabla para recuperar los datos que nos faltan. __Cockroach guarda siempre con los índices secundarios el índice primario__, de modo que acceder al resto de los datos se hace usando el índice primario.
+Como los datos que tenemos que recuperar no son exclusivamente los del Ã­ndice, para cada dato que identifiquemos tenemos que acceder a la tabla para recuperar los datos que nos faltan. __Cockroach guarda siempre con los Ã­ndices secundarios el Ã­ndice primario__, de modo que acceder al resto de los datos se hace usando el Ã­ndice primario.
 
 ```txt
   index-join |             |
-   ¦         | table       | users@primary
+   Â¦         | table       | users@primary
    +-- scan  |             |
 ```
 
-Los índices y los datos se guardan en rangos que no pueden superar los 64MB. El leaseholder guardara todos estos datos para servir consultas.
+Los Ã­ndices y los datos se guardan en rangos que no pueden superar los 64MB. El leaseholder guardara todos estos datos para servir consultas.
 
-### Extender el índice secundario
+### Extender el Ã­ndice secundario
 
-Modificar el índice secundario
+Modificar el Ã­ndice secundario
 
 Vamos a modificar la query anterior para recuperar el `credit_card`
 
@@ -518,7 +518,7 @@ EXPLAIN SELECT name, credit_card FROM users WHERE name = 'Cheyenne Smith';
              | distributed | false
              | vectorized  | false
   index-join |             |
-   ¦         | table       | users@primary
+   Â¦         | table       | users@primary
    +-- scan  |             |
              | table       | users@users_name_idx
              | spans       | /"Cheyenne Smith"-/"Cheyenne Smith"/PrefixEnd
@@ -527,7 +527,7 @@ EXPLAIN SELECT name, credit_card FROM users WHERE name = 'Cheyenne Smith';
 Time: 1.1756ms
 ```
 
-Acceso al índice secundario, y una vez filtrados los datos, usa el índice primario para recuperar el `credit_card`. Vamos a modificar el índice para que se almacene con el índice el `credit_card`:
+Acceso al Ã­ndice secundario, y una vez filtrados los datos, usa el Ã­ndice primario para recuperar el `credit_card`. Vamos a modificar el Ã­ndice para que se almacene con el Ã­ndice el `credit_card`:
 
 ```ps
 DROP INDEX users_name_idx;
@@ -552,7 +552,7 @@ EXPLAIN SELECT name, credit_card FROM users WHERE name = 'Cheyenne Smith';
 Time: 1.3745ms
 ```
 
-Ahora observamos que se utiliza únicamente el índice secundatio para hacer el acceso.
+Ahora observamos que se utiliza Ãºnicamente el Ã­ndice secundatio para hacer el acceso.
 
 ### Joins
 
@@ -578,22 +578,22 @@ EXPLAIN SELECT count(DISTINCT users.id) FROM users INNER JOIN rides ON rides.rid
                       | distributed | true                                                          
                       | vectorized  | false                                                         
   group               |             |                                                               
-   ¦                  | aggregate 0 | count(DISTINCT id)                                            
-   ¦                  | scalar      |                                                               
+   Â¦                  | aggregate 0 | count(DISTINCT id)                                            
+   Â¦                  | scalar      |                                                               
    +-- render         |             |                                                               
         +-- hash-join |             |                                                               
-             ¦        | type        | inner                                                         
-             ¦        | equality    | (rider_id) = (id)                                             
+             Â¦        | type        | inner                                                         
+             Â¦        | equality    | (rider_id) = (id)                                             
              +-- scan |             |                                                               
-             ¦        | table       | rides@primary                                                 
-             ¦        | spans       | ALL                                                           
-             ¦        | filter      | (start_time >= '2018-07-20 00:00:00+00:00') AND (start_time <= '2018-07-21 00:00:00+00:00')
+             Â¦        | table       | rides@primary                                                 
+             Â¦        | spans       | ALL                                                           
+             Â¦        | filter      | (start_time >= '2018-07-20 00:00:00+00:00') AND (start_time <= '2018-07-21 00:00:00+00:00')
              +-- scan |             |                                                               
                       | table       | users@primary                                                 
                       | spans       | ALL  
 ```
 
-Hace un scan del índice primario de la tabla rides, filtrando por `start_time`, y luego hace un scan en el índice primario de users buscando los que tengan los `rider_id` que nos interese. Si creamos un índice secundario que tenga el `start_time` y el `rider_id` podremos mejorar el acceso:
+Hace un scan del Ã­ndice primario de la tabla rides, filtrando por `start_time`, y luego hace un scan en el Ã­ndice primario de users buscando los que tengan los `rider_id` que nos interese. Si creamos un Ã­ndice secundario que tenga el `start_time` y el `rider_id` podremos mejorar el acceso:
 
 ```ps
 CREATE INDEX ON rides (start_time) STORING (rider_id);
@@ -607,15 +607,15 @@ EXPLAIN SELECT count(DISTINCT users.id) FROM users INNER JOIN rides ON rides.rid
                       | distributed | true
                       | vectorized  | false
   group               |             |
-   ¦                  | aggregate 0 | count(DISTINCT id)
-   ¦                  | scalar      |
+   Â¦                  | aggregate 0 | count(DISTINCT id)
+   Â¦                  | scalar      |
    +-- render         |             |
         +-- hash-join |             |
-             ¦        | type        | inner
-             ¦        | equality    | (id) = (rider_id)
+             Â¦        | type        | inner
+             Â¦        | equality    | (id) = (rider_id)
              +-- scan |             |
-             ¦        | table       | users@primary
-             ¦        | spans       | ALL
+             Â¦        | table       | users@primary
+             Â¦        | spans       | ALL
              +-- scan |             |
                       | table       | rides@rides_start_time_idx
                       | spans       | /2018-12-20T00:00:00Z-/2018-12-21T00:00:00.000000001Z
@@ -624,7 +624,7 @@ EXPLAIN SELECT count(DISTINCT users.id) FROM users INNER JOIN rides ON rides.rid
 Time: 2.2374ms
 ```
 
-Ahora usamos el índice secundario y la query es más rápida.
+Ahora usamos el Ã­ndice secundario y la query es mÃ¡s rÃ¡pida.
 
 ### Join algorithms
 
@@ -744,7 +744,7 @@ SELECT * FROM bank.accounts WHERE type = 'checking' AND customer_id=2;
 
 # Region
 
-Al arrancar un nodo podemos especificar la localización del nodo:
+Al arrancar un nodo podemos especificar la localizaciÃ³n del nodo:
 
 ```ps
 cockroach start --insecure --locality=country=us,region=us-east --store=node1 --listen-addr=localhost:26257 --http-addr=localhost:8080 --join=localhost:26257,localhost:26258,localhost:26259
@@ -752,7 +752,7 @@ cockroach start --insecure --locality=country=us,region=us-east --store=node1 --
 
 ## Geo Partitioning
 
-Podemos [particionar las tablas](https://www.cockroachlabs.com/docs/stable/partitioning.html) usando la localización. Esta es una feature disponible solo con la licencia entreprise:
+Podemos [particionar las tablas](https://www.cockroachlabs.com/docs/stable/partitioning.html) usando la localizaciÃ³n. Esta es una feature disponible solo con la licencia entreprise:
 
 ```ps
 SHOW RANGES FROM TABLE movr.vehicles;
